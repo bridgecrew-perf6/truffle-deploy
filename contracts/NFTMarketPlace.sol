@@ -195,8 +195,22 @@ contract NFTMarketPlace is ReentrancyGuard {
         emit ProductUpdated(id, newPrice, false, newOwner, newSeller);
     }
 
-    //Buy Item
+    function sendRoyaltiesToCreator(uint256 nftItemId)
+        public
+        payable
+        nonReentrant
+    {
+        idForMarketItem[nftItemId].creator.transfer(msg.value);
+    }
+    function sendAdimCommissionToAdmin(uint256 nftItemId)
+        public
+        payable
+        nonReentrant
+    {
+        idForMarketItem[nftItemId].admin.transfer(msg.value);
+    }
 
+    //Buy Item
     function createMarketForSale(address nftContract, uint256 nftItemId)
         public
         payable
@@ -205,8 +219,8 @@ contract NFTMarketPlace is ReentrancyGuard {
         // uint256 price = idForMarketItem[nftItemId].price;
         uint256 tokenId = idForMarketItem[nftItemId].tokenId;
 
-        // require(msg.value == price / 100 * 5, "should buy the price of item");
-        // idForMarketItem[nftItemId].seller.transfer(msg.value);
+        // require(msg.value == price, "should buy the price of item");
+        idForMarketItem[nftItemId].seller.transfer(msg.value);
         IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId); //buy
         idForMarketItem[nftItemId].owner = payable(msg.sender);
         idForMarketItem[nftItemId].sold = true;
